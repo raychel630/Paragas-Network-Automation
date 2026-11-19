@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Router Console</title>
+
+    <style>
+        :root {
+            --background: #f0faf5;
+            --surface: #ffffff;
+            --text: #183b2e;
+            --muted: #789187;
+            --border: #dceee4;
+            --accent: #42b883;
+            --accent-dark: #299968;
+            --danger: #c74747;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, #d9f5e7 0, transparent 35%),
+                var(--background);
+            color: var(--text);
+            font-family: Inter, -apple-system, BlinkMacSystemFont,
+                "Segoe UI", sans-serif;
+        }
+
+        .shell {
+            width: min(1100px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 60px 0;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .title-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #42b883;
+            box-shadow: 0 0 0 5px #d9f5e7;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 27px;
+            font-weight: 750;
+            letter-spacing: -0.8px;
+        }
+
+        .device {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #e1f5e9;
+            border: 1px solid #c9ead7;
+            border-radius: 30px;
+            color: #267a55;
+            font-size: 13px;
+            font-weight: 650;
+        }
+
+        .device::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: #42b883;
+            border-radius: 50%;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 12px 35px rgba(48, 115, 78, 0.08);
+            overflow: hidden;
+        }
+
+        .action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 28px;
+            background: linear-gradient(120deg, #ffffff, #f5fcf8);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .action-bar p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        button {
+            appearance: none;
+            border: 0;
+            border-radius: 10px;
+            background: var(--accent);
+            color: white;
+            padding: 13px 21px;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 12px rgba(66, 184, 131, 0.22);
+            transition: background 150ms ease, transform 150ms ease,
+                box-shadow 150ms ease;
+        }
+
+        button:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 16px rgba(66, 184, 131, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .error {
+            margin: 22px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            background: #fff1f1;
+            color: var(--danger);
+            border: 1px solid #f4d1d1;
+            font-size: 14px;
+        }
+
+        .results {
+            display: grid;
+            gap: 18px;
+            padding: 26px;
+        }
+
+        .output-card {
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: box-shadow 150ms ease;
+        }
+
+        .output-card:hover {
+            box-shadow: 0 5px 18px rgba(48, 115, 78, 0.08);
+        }
+
+        .output-card h2 {
+            margin: 0;
+            padding: 15px 18px;
+            background: #eaf8f0;
+            border-bottom: 1px solid var(--border);
+            color: #267a55;
+            font-size: 13px;
+            font-weight: 750;
+            letter-spacing: 0.5px;
+        }
+
+        pre {
+            margin: 0;
+            padding: 20px;
+            min-height: 64px;
+            overflow-x: auto;
+            background: #fbfefc;
+            color: #365346;
+            font: 12.5px/1.75 "Cascadia Code", Consolas, monospace;
+            white-space: pre-wrap;
+        }
+
+        .empty {
+            padding: 75px 20px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .empty-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 18px;
+            border-radius: 18px;
+            background: #e3f7ec;
+            color: #299968;
+            font-size: 26px;
+        }
+
+        .empty strong {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-size: 17px;
+        }
+
+        .empty p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        footer {
+            padding-top: 22px;
+            text-align: center;
+            color: #9aafa3;
+            font-size: 12px;
+        }
+
+        @media (max-width: 640px) {
+            .shell {
+                width: min(100% - 24px, 1100px);
+                padding: 30px 0;
+            }
+
+            header,
+            .action-bar {
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            header {
+                flex-direction: column;
+            }
+
+            .action-bar {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .results {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="shell">
+
+        <header>
+            <div class="title-group">
+                <span class="status-dot" aria-hidden="true"></span>
+                <h1>Router Console</h1>
+            </div>
+
+            <span class="device">192.168.10.121</span>
+        </header>
+
+        <section class="panel">
+
+            <form method="POST" class="action-bar">
+                <p>Run diagnostics on the connected Cisco device.</p>
+                <button type="submit">Run Commands →</button>
+            </form>
+
+            {% if error %}
+                <div class="error" role="alert">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            {% if results %}
+                <div class="results">
+                    {% for command, output in results.items() %}
+                        <article class="output-card">
+                            <h2>{{ command }}</h2>
+                            <pre>{{ output }}</pre>
+                        </article>
+                    {% endfor %}
+                </div>
+
+            {% elif not error %}
+                <div class="empty">
+                    <div class="empty-icon">⌘</div>
+                    <strong>No output yet</strong>
+                    <p>Run the diagnostics to view router information.</p>
+                </div>
+            {% endif %}
+
+        </section>
+
+        <footer>
+            Router Console · Network Diagnostics
+        </footer>
+
+    </main>
+</body>
+</html>
